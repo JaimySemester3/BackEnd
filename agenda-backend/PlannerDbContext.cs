@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using agenda_backend.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace agenda_backend
 {

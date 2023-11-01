@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using agenda_backend.Models;
 using agenda_backend.Services;
+using agenda_backend.Interfaces;
 
 namespace agenda_backend.Controllers;
 
@@ -8,14 +9,23 @@ namespace agenda_backend.Controllers;
 [Route("api/[controller]")]
 public class TasksController : ControllerBase
 {
-    private readonly TasksService _tasksService;
+    private readonly ITaskService _tasksService;
 
-    public TasksController(TasksService tasksService) =>
+    public TasksController(ITaskService tasksService) =>
         _tasksService = tasksService;
 
-    [HttpGet]
-    public async Task<List<TaskItem>> Get() =>
-        await _tasksService.GetAsync();
+ [HttpGet]
+public async Task<ActionResult<List<TaskItem>>> Get()
+{
+    var tasks = await _tasksService.GetAsync();
+
+    if (tasks == null || tasks.Count == 0)
+    {
+        return NotFound();
+    }
+
+    return tasks;
+}
 
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<TaskItem>> Get(string id)

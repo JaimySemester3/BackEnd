@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
+using System.Text.Json.Serialization;
 
 namespace agenda_backend.Models
 {
@@ -10,6 +11,7 @@ namespace agenda_backend.Models
         public string? Id { get; set; }
 
         [BsonElement("Name")]
+        [JsonPropertyName("Name")]
         public string TaskName { get; set; } = null!;
 
     }

@@ -1,5 +1,6 @@
 using agenda_backend.Models;
 using agenda_backend.Services;
+using agenda_backend.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,9 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<TaskDatabaseSettings>(
     builder.Configuration.GetSection("TaskDatabase"));
 
-builder.Services.AddSingleton<TasksService>();
+builder.Services.AddSingleton<ITaskService,TasksService>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(
+        options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

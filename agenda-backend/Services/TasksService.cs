@@ -1,10 +1,11 @@
-﻿using agenda_backend.Models;
+﻿using agenda_backend.Interfaces;
+using agenda_backend.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 namespace agenda_backend.Services
 {
-    public class TasksService
+    public class TasksService : ITaskService
     {
         private readonly IMongoCollection<TaskItem> _taskItemsCollection;
 

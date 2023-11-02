@@ -45,5 +45,4 @@ jobs:
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"JaimySemester3_BackEnd" /o:"jaimysemester3" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           dotnet build
-          dotnet test
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"

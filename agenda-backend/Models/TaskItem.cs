@@ -11,7 +11,7 @@ namespace agenda_backend.Models
         public string? Id { get; set; }
 
         [BsonElement("Name")]
-        [JsonPropertyName("Name")]
+        [JsonPropertyName("taskName")]
         public string TaskName { get; set; } = null!;
 
     }

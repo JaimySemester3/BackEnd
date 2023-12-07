@@ -1,16 +1,16 @@
 ﻿using Xunit;
 using Moq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using MongoDB.Driver;
 using agenda_backend.Models;
 using agenda_backend.Services;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+using agenda_backend.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace agenda_backend.Tests
 {
-    public class TaskServiceTests
+    public class TasksServiceTests
     {
-
+  
     }
 }

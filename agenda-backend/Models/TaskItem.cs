@@ -14,5 +14,8 @@ namespace agenda_backend.Models
         [JsonPropertyName("taskName")]
         public string TaskName { get; set; } = null!;
 
+        [BsonElement("Priority")]
+        public int Priority { get; set; }
+
     }
 }

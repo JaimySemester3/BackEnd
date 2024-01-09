@@ -2,6 +2,7 @@
 using agenda_backend.Models;
 using agenda_backend.Services;
 using agenda_backend.Interfaces;
+using System.Text.Json;
 
 namespace agenda_backend.Controllers;
 
@@ -49,7 +50,7 @@ public async Task<ActionResult<List<TaskItem>>> Get()
     }
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, TaskItem updatedTask)
+    public async Task<IActionResult> Update(string id, [FromBody] JsonElement json)
     {
         var task = await _tasksService.GetAsync(id);
 
@@ -58,11 +59,23 @@ public async Task<ActionResult<List<TaskItem>>> Get()
             return NotFound();
         }
 
-        updatedTask.Id = task.Id;
+        // Check if the JSON object contains the "priority" field
+        if (json.TryGetProperty("priority", out var priorityProperty) && priorityProperty.ValueKind == JsonValueKind.Number)
+        {
+            int newPriority = priorityProperty.GetInt32();
 
-        await _tasksService.UpdateAsync(id, updatedTask);
+            // Update the priority of the existing task
+            task.Priority = newPriority;
 
-        return NoContent();
+            await _tasksService.UpdateAsync(id, task);
+
+            return NoContent();
+        }
+        else
+        {
+            // Return BadRequest if the "priority" field is missing or not a number
+            return BadRequest("Invalid or missing priority field in the request.");
+        }
     }
 
     //ID length testen

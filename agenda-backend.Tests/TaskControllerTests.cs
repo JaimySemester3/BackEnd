@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using agenda_backend.Controllers;
 using agenda_backend.Models;
 using agenda_backend.Interfaces;
+using System.Text.Json;
 
 namespace agenda_backend.Tests
 {
@@ -108,11 +109,12 @@ namespace agenda_backend.Tests
 
 
         [Fact]
-        public async Task Update_WithValidId_UpdatesTaskAndReturnsNoContent()
+        public async Task Update_WithValidIdAndPriorityInJson_UpdatesTaskPriorityAndReturnsNoContent()
         {
             // Arrange
             var taskId = "1";
-            var updatedTask = new TaskItem { Id = taskId, TaskName = "Updated Task" };
+            var updatedTask = new TaskItem { Id = taskId, TaskName = "Updated Task", Priority = 2 }; // Assuming priority is included in the update
+            var jsonPayload = JsonSerializer.Serialize(new { priority = updatedTask.Priority }); // Create JSON payload with priority field
             var taskServiceMock = new Mock<ITaskService>();
             taskServiceMock.Setup(service => service.GetAsync(taskId)).ReturnsAsync(updatedTask);
             taskServiceMock.Setup(service => service.UpdateAsync(taskId, updatedTask)).Returns(Task.CompletedTask);
@@ -120,10 +122,31 @@ namespace agenda_backend.Tests
             var controller = new TasksController(taskServiceMock.Object);
 
             // Act
-            var result = await controller.Update(taskId, updatedTask);
+            var result = await controller.Update(taskId, JsonDocument.Parse(jsonPayload).RootElement);
 
             // Assert
             Assert.IsType<NoContentResult>(result);
+        }
+
+        [Fact]
+        public async Task Update_WithValidIdAndNoPriorityInJson_ReturnsBadRequest()
+        {
+            // Arrange
+            var taskId = "1";
+            var updatedTask = new TaskItem { Id = taskId, TaskName = "Updated Task" };
+            var jsonPayload = JsonSerializer.Serialize(new { }); // Create empty JSON payload
+            var taskServiceMock = new Mock<ITaskService>();
+            taskServiceMock.Setup(service => service.GetAsync(taskId)).ReturnsAsync(updatedTask);
+
+            var controller = new TasksController(taskServiceMock.Object);
+
+            // Act
+            var result = await controller.Update(taskId, JsonDocument.Parse(jsonPayload).RootElement);
+
+            // Assert
+            Assert.IsType<BadRequestObjectResult>(result);
+            var badRequestResult = (BadRequestObjectResult)result;
+            Assert.Equal("Invalid or missing priority field in the request.", badRequestResult.Value);
         }
 
         [Fact]
@@ -132,17 +155,19 @@ namespace agenda_backend.Tests
             // Arrange
             var taskId = "nonexistent";
             var updatedTask = new TaskItem { Id = taskId, TaskName = "Updated Task" };
+            var jsonPayload = JsonSerializer.Serialize(new { }); // Create empty JSON payload
             var taskServiceMock = new Mock<ITaskService>();
             taskServiceMock.Setup(service => service.GetAsync(taskId)).ReturnsAsync((TaskItem)null);
 
             var controller = new TasksController(taskServiceMock.Object);
 
             // Act
-            var result = await controller.Update(taskId, updatedTask);
+            var result = await controller.Update(taskId, JsonDocument.Parse(jsonPayload).RootElement);
 
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
+
 
         [Fact]
         public async Task Delete_WithValidId_RemovesTaskAndReturnsNoContent()
